@@ -8,37 +8,33 @@ constexpr uint8_t I2C_SCL_PIN = 22;
 constexpr uint8_t BTN_INT_A_PIN = 34;
 constexpr uint8_t BTN_INT_B_PIN = 35;
 
-constexpr uint8_t NUM_CHANNELS = 27;
-
 constexpr uint8_t BUTTON_EXP_A = 0x20;
 constexpr uint8_t BUTTON_EXP_B = 0x21;
 constexpr uint8_t LED_EXP_A = 0x22;
 constexpr uint8_t LED_EXP_B = 0x23;
 
-struct ExpandedPin {
-  uint8_t address;
-  uint8_t pin; // 0..15
-};
+constexpr uint8_t NUM_ROWS = 4;
+constexpr uint8_t ROW_LENGTHS[NUM_ROWS] = {1, 3, 5, 7};
+constexpr uint8_t ROW_STARTS[NUM_ROWS] = {0, 1, 4, 9};
+constexpr uint8_t NUM_TOKENS = 16; // 1 + 3 + 5 + 7
 
-ExpandedPin buttonMap[NUM_CHANNELS];
-ExpandedPin ledMap[NUM_CHANNELS];
+constexpr uint8_t START_BUTTON_PIN = 0; // BUTTON_EXP_B GPA0
+constexpr uint8_t PLAYER1_LED_PIN = 0;  // LED_EXP_B GPA0
+constexpr uint8_t PLAYER2_LED_PIN = 1;  // LED_EXP_B GPA1
+constexpr unsigned long WINNER_BLINK_MS = 700;
+
+bool tokenAlive[NUM_TOKENS];
+bool gameActive = false;
+uint8_t currentPlayer = 0; // 0 => P1, 1 => P2
+uint8_t winner = 255;
 
 uint16_t buttonsA = 0xFFFF;
 uint16_t buttonsB = 0xFFFF;
-uint16_t lastLedWriteA = 0xFFFF;
-uint16_t lastLedWriteB = 0xFFFF;
+uint16_t lastLedsA = 0xFFFF;
+uint16_t lastLedsB = 0xFFFF;
+bool winnerBlinkOn = true;
+unsigned long lastWinnerBlinkMs = 0;
 
-void buildMaps() {
-  for (uint8_t i = 0; i < NUM_CHANNELS; ++i) {
-    buttonMap[i] = (i < 16) ? ExpandedPin{BUTTON_EXP_A, i}
-                            : ExpandedPin{BUTTON_EXP_B, static_cast<uint8_t>(i - 16)};
-    ledMap[i] = (i < 16) ? ExpandedPin{LED_EXP_A, i}
-                         : ExpandedPin{LED_EXP_B, static_cast<uint8_t>(i - 16)};
-  }
-}
-
-// Custom chip protocol:
-// write two bytes only: low port then high port.
 bool writePorts(uint8_t address, uint16_t value) {
   Wire.beginTransmission(address);
   Wire.write(static_cast<uint8_t>(value & 0xFF));
@@ -55,55 +51,142 @@ uint16_t readPorts(uint8_t address) {
   return static_cast<uint16_t>(low) | (static_cast<uint16_t>(high) << 8);
 }
 
-bool isPressed(uint8_t index) {
-  const ExpandedPin pin = buttonMap[index];
-  const uint16_t mask = static_cast<uint16_t>(1U << pin.pin);
-  const bool levelHigh = (pin.address == BUTTON_EXP_A) ? ((buttonsA & mask) != 0)
-                                                        : ((buttonsB & mask) != 0);
-  return !levelHigh; // pull-up input: LOW means pressed
+uint8_t rowForToken(uint8_t tokenIndex) {
+  for (uint8_t row = 0; row < NUM_ROWS; ++row) {
+    const uint8_t start = ROW_STARTS[row];
+    const uint8_t end = static_cast<uint8_t>(start + ROW_LENGTHS[row] - 1);
+    if (tokenIndex >= start && tokenIndex <= end) {
+      return row;
+    }
+  }
+  return 0;
 }
 
-void refreshButtonStatesIfNeeded() {
-  // INTA is open-drain on the custom chip. Use ESP32 internal pull-ups.
-  const bool needReadA = (digitalRead(BTN_INT_A_PIN) == LOW);
-  const bool needReadB = (digitalRead(BTN_INT_B_PIN) == LOW);
+bool noTokensLeft() {
+  for (uint8_t i = 0; i < NUM_TOKENS; ++i) {
+    if (tokenAlive[i]) {
+      return false;
+    }
+  }
+  return true;
+}
 
-  if (needReadA) {
+void pushLeds(bool force = false) {
+  // Custom chip behavior:
+  // bit=1 => INPUT_PULLUP (drives LED anode high in this wiring, LED ON)
+  // bit=0 => OUTPUT_LOW (LED OFF)
+  uint16_t ledTokens = 0;
+  for (uint8_t i = 0; i < NUM_TOKENS; ++i) {
+    if (tokenAlive[i]) {
+      ledTokens |= static_cast<uint16_t>(1U << i);
+    }
+  }
+
+  uint16_t ledTurns = 0;
+  if (gameActive) {
+    ledTurns |= static_cast<uint16_t>(1U << (currentPlayer == 0 ? PLAYER1_LED_PIN : PLAYER2_LED_PIN));
+  } else if (winner <= 1) {
+    if (winnerBlinkOn) {
+      ledTurns |= static_cast<uint16_t>(1U << (winner == 0 ? PLAYER1_LED_PIN : PLAYER2_LED_PIN));
+    }
+  }
+
+  if (force || ledTokens != lastLedsA) {
+    writePorts(LED_EXP_A, ledTokens);
+    lastLedsA = ledTokens;
+  }
+  if (force || ledTurns != lastLedsB) {
+    writePorts(LED_EXP_B, ledTurns);
+    lastLedsB = ledTurns;
+  }
+}
+
+void startNewGame() {
+  for (uint8_t i = 0; i < NUM_TOKENS; ++i) {
+    tokenAlive[i] = true;
+  }
+  gameActive = true;
+  currentPlayer = 0;
+  winner = 255;
+  winnerBlinkOn = true;
+  lastWinnerBlinkMs = millis();
+  pushLeds(true);
+  Serial.println("New game started. Player 1 turn.");
+}
+
+void applyMove(uint8_t tokenIndex) {
+  if (tokenIndex >= NUM_TOKENS || !tokenAlive[tokenIndex] || !gameActive) {
+    return;
+  }
+
+  const uint8_t row = rowForToken(tokenIndex);
+  const uint8_t rowStart = ROW_STARTS[row];
+  const uint8_t rowEnd = static_cast<uint8_t>(rowStart + ROW_LENGTHS[row] - 1);
+
+  // Nim move with one click: remove selected token and all tokens to its right in same row.
+  for (uint8_t i = tokenIndex; i <= rowEnd; ++i) {
+    tokenAlive[i] = false;
+  }
+
+  if (noTokensLeft()) {
+    gameActive = false;
+    winner = currentPlayer;
+    winnerBlinkOn = true;
+    lastWinnerBlinkMs = millis();
+    Serial.printf("Player %u wins. Press START for new game.\n", static_cast<unsigned>(winner + 1));
+  } else {
+    currentPlayer = static_cast<uint8_t>(1 - currentPlayer);
+    Serial.printf("Player %u turn.\n", static_cast<unsigned>(currentPlayer + 1));
+  }
+
+  pushLeds(true);
+}
+
+void updateWinnerBlink() {
+  if (gameActive || winner > 1) {
+    return;
+  }
+
+  const unsigned long now = millis();
+  if (now - lastWinnerBlinkMs < WINNER_BLINK_MS) {
+    return;
+  }
+
+  lastWinnerBlinkMs = now;
+  winnerBlinkOn = !winnerBlinkOn;
+  pushLeds(false);
+}
+
+void pollButtonsAndHandleEdges() {
+  const uint16_t oldA = buttonsA;
+  const uint16_t oldB = buttonsB;
+
+  // INTA is open-drain. LOW means there was an input change.
+  if (digitalRead(BTN_INT_A_PIN) == LOW) {
     buttonsA = readPorts(BUTTON_EXP_A);
   }
-  if (needReadB) {
+  if (digitalRead(BTN_INT_B_PIN) == LOW) {
     buttonsB = readPorts(BUTTON_EXP_B);
   }
-}
 
-void pushLedState(bool force = false) {
-  // On this custom chip:
-  // bit=0 => output low
-  // bit=1 => input_pullup/high
-  // With the current wiring (LED anode on expander pin, cathode to GND),
-  // pressed button should light LED -> use bit=1 for ON.
-  uint16_t ledA = 0;
-  uint16_t ledB = 0;
+  const uint16_t pressedA = static_cast<uint16_t>(oldA & ~buttonsA); // HIGH -> LOW
+  const uint16_t pressedB = static_cast<uint16_t>(oldB & ~buttonsB); // HIGH -> LOW
 
-  for (uint8_t i = 0; i < NUM_CHANNELS; ++i) {
-    if (!isPressed(i)) {
-      continue;
-    }
-    const ExpandedPin ledPin = ledMap[i];
-    if (ledPin.address == LED_EXP_A) {
-      ledA |= static_cast<uint16_t>(1U << ledPin.pin);
-    } else {
-      ledB |= static_cast<uint16_t>(1U << ledPin.pin);
-    }
+  if (pressedB & static_cast<uint16_t>(1U << START_BUTTON_PIN)) {
+    startNewGame();
+    return;
   }
 
-  if (force || ledA != lastLedWriteA) {
-    writePorts(LED_EXP_A, ledA);
-    lastLedWriteA = ledA;
+  if (!gameActive) {
+    return;
   }
-  if (force || ledB != lastLedWriteB) {
-    writePorts(LED_EXP_B, ledB);
-    lastLedWriteB = ledB;
+
+  // One click = one move.
+  for (uint8_t i = 0; i < NUM_TOKENS; ++i) {
+    if (pressedA & static_cast<uint16_t>(1U << i)) {
+      applyMove(i);
+      return;
+    }
   }
 }
 } // namespace
@@ -111,26 +194,29 @@ void pushLedState(bool force = false) {
 void setup() {
   Serial.begin(115200);
   Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);
-  buildMaps();
 
   pinMode(BTN_INT_A_PIN, INPUT_PULLUP);
   pinMode(BTN_INT_B_PIN, INPUT_PULLUP);
 
-  // Buttons as inputs with pull-up on all 16 pins for each chip.
+  // Button chips: all pins input/pull-up.
   writePorts(BUTTON_EXP_A, 0xFFFF);
   writePorts(BUTTON_EXP_B, 0xFFFF);
 
-  // Prime initial state once (also clears initial interrupt flags in the chip).
+  // Prime button state once (also clears interrupt flags).
   buttonsA = readPorts(BUTTON_EXP_A);
   buttonsB = readPorts(BUTTON_EXP_B);
-  pushLedState(true);
 
-  Serial.println("Port-expander test ready (27 buttons + 27 LEDs).");
+  // LEDs off before game start.
+  writePorts(LED_EXP_A, 0x0000);
+  writePorts(LED_EXP_B, 0x0000);
+  lastLedsA = 0x0000;
+  lastLedsB = 0x0000;
+
+  startNewGame();
 }
 
 void loop() {
-  refreshButtonStatesIfNeeded();
-  pushLedState(false);
-  delay(2);
+  pollButtonsAndHandleEdges();
+  updateWinnerBlink();
+  delay(3);
 }
-
