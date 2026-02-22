@@ -1,0 +1,9 @@
+[wokwi]
+version = 1
+diagram = "diagram.json"
+elf = ".pio/build/esp32/firmware.elf"
+firmware = ".pio/build/esp32/firmware.bin"
+
+[[chip]]
+name = "mcp23017"
+binary = "dist/mcp23017.chip.wasm"
