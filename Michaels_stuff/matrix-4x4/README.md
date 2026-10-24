@@ -15,7 +15,7 @@ Monitor reports the mode, moves, turns, and winner.
 |---|---|
 | Matrix scan rows | 1, 2, 4, 5 |
 | Matrix scan columns | 6, 7, 8, 9 |
-| Individual game LED outputs (lights 1–16) | 10–18, 21, 37, 47, 35, 36, 3, 45 |
+| Individual game LED outputs (lights 1–16) | 10–18, 21, 19, 20, 35, 36, 46, 48 |
 | Player turn LEDs | 38, 39 |
 | Mode slide switch | 40 |
 | Winner LEDs | 41, 42 |
@@ -36,16 +36,21 @@ For reliable real-hardware scans, add one small signal diode in series with
 each button to prevent ghost readings if multiple buttons are pressed at once.
 With this firmware's scan direction, connect each diode's anode to the column
 side and its striped cathode to the row side. Connect the matrix and LED grounds
-to ESP32 GND. Check that GPIO 47 is brought out on the exact ESP32-S3 board
-before building the physical version.
+to ESP32 GND. Check that GPIO 19, 20, 46 and 48 are brought out on the exact
+ESP32-S3 board before building the physical version.
 
 The Serial Monitor uses UART0 (GPIO 43/44, the DevKitC-1 `TX`/`RX` pins and
 its UART USB port), so no game LED uses those pins. Don't enable
 `ARDUINO_USB_CDC_ON_BOOT`: with it, the firmware hangs in Wokwi before any
-LED lights or any button is read. GPIO 33 and 34 are not broken out on the
-DevKitC-1, so lights 11 and 12 use GPIO 37 and 47. Lights 15 and 16 use the
-strapping pins GPIO 3 and 45; their LED and resistor to GND hold them low,
-which matches the default boot configuration.
+LED lights or any button is read.
+
+Lights 11, 12, 15 and 16 use GPIO 19, 20, 46 and 48. GPIO 33 and 34 are not
+broken out on the DevKitC-1. GPIO 3, 37, 45 and 47 left those LEDs dark in
+Wokwi for VS Code, even though they lit on wokwi.com. GPIO 19 and 20 are the
+native USB data pins; they are free because the firmware doesn't use native USB.
+GPIO 46 is a strapping pin, and its LED and resistor to GND hold it low, which
+matches the default boot configuration. On DevKitC-1 v1.0 boards, GPIO 48 also
+drives the onboard RGB LED, which may flicker.
 
 In Wokwi, the slide switch starts on the GND side, so the game begins in
 two-player mode. Click the switch to change to AI mode; the game restarts and
