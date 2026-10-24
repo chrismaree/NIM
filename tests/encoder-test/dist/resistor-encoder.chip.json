@@ -1,0 +1,6 @@
+{
+  "name": "resistor-encoder",
+  "author": "NIM test setup",
+  "pins": ["A", "B", "OUT", "GND", "VCC"],
+  "controls": []
+}

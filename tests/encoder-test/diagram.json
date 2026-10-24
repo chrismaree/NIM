@@ -1,0 +1,106 @@
+{
+  "version": 1,
+  "author": "NIM test setup",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-esp32-devkit-v1",
+      "id": "esp",
+      "top": 104.6,
+      "left": -5.4,
+      "attrs": {}
+    },
+    {
+      "type": "chip-resistor-encoder",
+      "id": "enc",
+      "top": 150,
+      "left": -170,
+      "attrs": {
+        "vcc": "3.3",
+        "r_pullup": "10000",
+        "r_a": "20000",
+        "r_b": "10000"
+      }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btnA",
+      "top": 260,
+      "left": -300,
+      "attrs": {
+        "color": "red",
+        "label": "A",
+        "key": "a",
+        "bounce": "0"
+      }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btnB",
+      "top": 340,
+      "left": -300,
+      "attrs": {
+        "color": "green",
+        "label": "B",
+        "key": "b",
+        "bounce": "0"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "ledA",
+      "top": -20,
+      "left": 160,
+      "attrs": {
+        "color": "red"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "rla",
+      "top": 60,
+      "left": 150,
+      "rotate": 90,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "ledB",
+      "top": -20,
+      "left": 220,
+      "attrs": {
+        "color": "green"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "rlb",
+      "top": 60,
+      "left": 210,
+      "rotate": 90,
+      "attrs": {
+        "value": "220"
+      }
+    }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "enc:VCC", "esp:3V3", "red", [] ],
+    [ "enc:GND", "esp:GND.1", "black", [] ],
+    [ "enc:OUT", "esp:D34", "orange", [] ],
+    [ "btnA:1.r", "enc:A", "orange", [] ],
+    [ "btnA:2.l", "esp:GND.1", "black", [] ],
+    [ "btnB:1.r", "enc:B", "orange", [] ],
+    [ "btnB:2.l", "esp:GND.1", "black", [] ],
+    [ "esp:D18", "rla:2", "red", [] ],
+    [ "rla:1", "ledA:A", "red", [] ],
+    [ "ledA:C", "esp:GND.2", "black", [] ],
+    [ "esp:D19", "rlb:2", "green", [] ],
+    [ "rlb:1", "ledB:A", "green", [] ],
+    [ "ledB:C", "esp:GND.2", "black", [] ]
+  ],
+  "dependencies": {}
+}

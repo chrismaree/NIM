@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "author": "NIM test setup",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-esp32-devkit-v1", "id": "esp", "top": 100, "left": 0, "attrs": {} },
+
+    { "type": "wokwi-pushbutton", "id": "btn00", "top": 0, "left": -260, "attrs": { "color": "red", "label": "R0C0", "key": "1", "bounce": "0" } },
+    { "type": "wokwi-pushbutton", "id": "btn01", "top": 0, "left": -150, "attrs": { "color": "green", "label": "R0C1", "key": "2", "bounce": "0" } },
+    { "type": "wokwi-pushbutton", "id": "btn10", "top": 90, "left": -260, "attrs": { "color": "blue", "label": "R1C0", "key": "3", "bounce": "0" } },
+    { "type": "wokwi-pushbutton", "id": "btn11", "top": 90, "left": -150, "attrs": { "color": "yellow", "label": "R1C1", "key": "4", "bounce": "0" } },
+
+    { "type": "wokwi-led", "id": "led00", "top": -40, "left": 200, "attrs": { "color": "red" } },
+    { "type": "wokwi-led", "id": "led01", "top": -40, "left": 260, "attrs": { "color": "green" } },
+    { "type": "wokwi-led", "id": "led10", "top": -40, "left": 320, "attrs": { "color": "blue" } },
+    { "type": "wokwi-led", "id": "led11", "top": -40, "left": 380, "attrs": { "color": "yellow" } },
+
+    { "type": "wokwi-resistor", "id": "r00", "top": 60, "left": 185, "rotate": 90, "attrs": { "value": "220" } },
+    { "type": "wokwi-resistor", "id": "r01", "top": 60, "left": 245, "rotate": 90, "attrs": { "value": "220" } },
+    { "type": "wokwi-resistor", "id": "r10", "top": 60, "left": 305, "rotate": 90, "attrs": { "value": "220" } },
+    { "type": "wokwi-resistor", "id": "r11", "top": 60, "left": 365, "rotate": 90, "attrs": { "value": "220" } }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+
+    [ "esp:D25", "btn00:1.l", "orange", [] ],
+    [ "esp:D25", "btn01:1.l", "orange", [] ],
+    [ "esp:D26", "btn10:1.l", "purple", [] ],
+    [ "esp:D26", "btn11:1.l", "purple", [] ],
+
+    [ "esp:D32", "btn00:2.r", "cyan", [] ],
+    [ "esp:D32", "btn10:2.r", "cyan", [] ],
+    [ "esp:D33", "btn01:2.r", "magenta", [] ],
+    [ "esp:D33", "btn11:2.r", "magenta", [] ],
+
+    [ "esp:D18", "r00:2", "red", [] ],
+    [ "esp:D19", "r01:2", "green", [] ],
+    [ "esp:D21", "r10:2", "blue", [] ],
+    [ "esp:D22", "r11:2", "gold", [] ],
+    [ "r00:1", "led00:A", "red", [] ],
+    [ "r01:1", "led01:A", "green", [] ],
+    [ "r10:1", "led10:A", "blue", [] ],
+    [ "r11:1", "led11:A", "gold", [] ],
+
+    [ "led00:C", "esp:GND.1", "black", [] ],
+    [ "led01:C", "esp:GND.1", "black", [] ],
+    [ "led10:C", "esp:GND.1", "black", [] ],
+    [ "led11:C", "esp:GND.1", "black", [] ]
+  ],
+  "dependencies": {}
+}

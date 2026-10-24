@@ -1,20 +1,20 @@
 .pio/build/esp32dev/FrameworkArduino/WMath.cpp.o: \
- /Users/michael/.platformio/packages/framework-arduinoespressif32/cores/esp32/WMath.cpp \
- /Users/michael/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/esp_system/include/esp_system.h \
- /Users/michael/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/esp_common/include/esp_err.h \
- /Users/michael/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/esp_common/include/esp_compiler.h \
- /Users/michael/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/esp_common/include/esp_attr.h \
- /Users/michael/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/esp_common/include/esp_bit_defs.h \
- /Users/michael/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/esp_common/include/esp_idf_version.h \
- /Users/michael/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/esp_hw_support/include/esp_mac.h \
- /Users/michael/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/esp_hw_support/include/esp_chip_info.h \
- /Users/michael/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/esp_hw_support/include/esp_random.h \
- /Users/michael/.platformio/packages/framework-arduinoespressif32/cores/esp32/esp32-hal-log.h \
- /Users/michael/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/esp_timer/include/esp_timer.h \
- /Users/michael/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/log/include/esp_log.h \
- /Users/michael/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/esp_rom/include/esp_rom_sys.h \
- /Users/michael/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/soc/esp32s3/include/soc/reset_reasons.h \
- /Users/michael/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/esp_rom/include/esp32s3/rom/ets_sys.h \
- /Users/michael/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/soc/esp32s3/include/soc/soc.h \
- /Users/michael/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/esp_common/include/esp_assert.h \
- /Users/michael/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/log/include/esp_log_internal.h
+ /Users/chris/.platformio/packages/framework-arduinoespressif32@src-702d0f93023d86e22d8ef62aa333f0b7/cores/esp32/WMath.cpp \
+ /Users/chris/.platformio/packages/framework-arduinoespressif32-libs/esp32s3/include/esp_system/include/esp_system.h \
+ /Users/chris/.platformio/packages/framework-arduinoespressif32-libs/esp32s3/include/esp_common/include/esp_err.h \
+ /Users/chris/.platformio/packages/framework-arduinoespressif32-libs/esp32s3/include/esp_common/include/esp_compiler.h \
+ /Users/chris/.platformio/packages/framework-arduinoespressif32-libs/esp32s3/include/esp_common/include/esp_attr.h \
+ /Users/chris/.platformio/packages/framework-arduinoespressif32-libs/esp32s3/include/esp_common/include/esp_bit_defs.h \
+ /Users/chris/.platformio/packages/framework-arduinoespressif32-libs/esp32s3/include/esp_common/include/esp_idf_version.h \
+ /Users/chris/.platformio/packages/framework-arduinoespressif32@src-702d0f93023d86e22d8ef62aa333f0b7/cores/esp32/esp32-hal-log.h \
+ /Users/chris/.platformio/packages/framework-arduinoespressif32-libs/esp32s3/include/esp_timer/include/esp_timer.h \
+ /Users/chris/.platformio/packages/framework-arduinoespressif32-libs/esp32s3/include/esp_hw_support/include/esp_etm.h \
+ /Users/chris/.platformio/packages/framework-arduinoespressif32-libs/esp32s3/include/esp_rom/include/esp32s3/rom/ets_sys.h \
+ /Users/chris/.platformio/packages/framework-arduinoespressif32-libs/esp32s3/include/soc/esp32s3/include/soc/soc.h \
+ /Users/chris/.platformio/packages/framework-arduinoespressif32-libs/esp32s3/include/esp_common/include/esp_assert.h \
+ /Users/chris/.platformio/packages/framework-arduinoespressif32-libs/esp32s3/include/soc/esp32s3/include/soc/reg_base.h \
+ /Users/chris/.platformio/packages/framework-arduinoespressif32-libs/esp32s3/include/log/include/esp_log.h \
+ /Users/chris/.platformio/packages/framework-arduinoespressif32-libs/esp32s3/include/esp_rom/include/esp_rom_sys.h \
+ /Users/chris/.platformio/packages/framework-arduinoespressif32-libs/esp32s3/include/soc/esp32s3/include/soc/reset_reasons.h \
+ /Users/chris/.platformio/packages/framework-arduinoespressif32-libs/esp32s3/include/log/include/esp_log_internal.h \
+ /Users/chris/.platformio/packages/framework-arduinoespressif32-libs/esp32s3/include/esp_hw_support/include/esp_random.h
