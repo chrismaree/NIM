@@ -5,7 +5,7 @@ constexpr uint8_t MATRIX_SIZE = 4;
 constexpr uint8_t MATRIX_ROW_PINS[MATRIX_SIZE] = {1, 2, 4, 5};
 constexpr uint8_t MATRIX_COLUMN_PINS[MATRIX_SIZE] = {6, 7, 8, 9};
 constexpr uint8_t LED_PINS[LIGHT_COUNT] = {
-    10, 11, 12, 13, 14, 15, 16, 17, 18, 21, 37, 47, 35, 36, 3, 45};
+    10, 11, 12, 13, 14, 15, 16, 17, 18, 21, 19, 20, 35, 36, 46, 48};
 constexpr uint8_t PLAYER_INDICATOR_PINS[2] = {38, 39};
 constexpr uint8_t MODE_SWITCH_PIN = 40;
 constexpr uint8_t WINNER_LED_PINS[2] = {41, 42};
