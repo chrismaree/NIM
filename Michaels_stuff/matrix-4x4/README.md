@@ -15,7 +15,7 @@ Monitor reports the mode, moves, turns, and winner.
 |---|---|
 | Matrix scan rows | 1, 2, 4, 5 |
 | Matrix scan columns | 6, 7, 8, 9 |
-| Individual game LED outputs (lights 1–16) | 10–18, 21, 33–36, 43, 44 |
+| Individual game LED outputs (lights 1–16) | 10–18, 21, 37, 47, 35, 36, 43 (TX), 44 (RX) |
 | Player turn LEDs | 38, 39 |
 | Mode slide switch | 40 |
 | Winner LEDs | 41, 42 |
@@ -39,8 +39,11 @@ side and its striped cathode to the row side. Connect the matrix and LED grounds
 to ESP32 GND. Check that GPIO 47 is brought out on the exact ESP32-S3 board
 before building the physical version.
 
-The last two game LEDs use GPIO 43 and 44. USB CDC is enabled so the Serial
-Monitor uses the native USB connection rather than those GPIOs.
+The last two game LEDs use GPIO 43 and 44, which the DevKitC-1 labels `TX`
+and `RX` (use `esp:TX` / `esp:RX` in `diagram.json`). USB CDC is enabled so the
+Serial Monitor uses the native USB connection rather than those GPIOs. GPIO 33
+and 34 are not broken out on the DevKitC-1, so lights 11 and 12 use GPIO 37 and
+47 instead.
 
 ## Run in Wokwi
 
