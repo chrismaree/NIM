@@ -11,6 +11,9 @@ Monitor reports the mode, moves, turns, and winner.
 
 ## Pin use
 
+For the full button-by-button wiring, the row/column matrix and the header
+layout, see [`wiring.md`](wiring.md).
+
 | Purpose | ESP32-S3 GPIOs |
 |---|---|
 | Matrix scan rows | 1, 2, 4, 5 |
